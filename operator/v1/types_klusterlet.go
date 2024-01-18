@@ -1,6 +1,9 @@
 package v1
 
-import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+import (
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+)
 
 // +genclient
 // +genclient:nonNamespaced
@@ -86,6 +89,32 @@ type KlusterletSpec struct {
 	// registration-agent and work-agent will use it to communicate with hub api server.
 	// +optional
 	HubApiServerHostAlias *HubApiServerHostAlias `json:"hubApiServerHostAlias,omitempty"`
+
+	// ResourceRequirement specify QoS classes of deployments managed by klusterlet.
+	// It applies to all the containers in the deployments.
+	// +optional
+	ResourceRequirement *ResourceRequirement `json:"resourceRequirement,omitempty"`
+}
+
+type ResourceQosClass string
+
+const (
+	// Default use resource setting in the template file (with requests but no limits in the resources)
+	ResourceQosClassDefault ResourceQosClass = "Default"
+	// If all containers in the pod don't set resource request and limits, the pod is treated as BestEffort.
+	ResourceQosClassBestEffort ResourceQosClass = "BestEffort"
+	// Configurable resource requirements with requests and limits
+	ResourceQosClassResourceRequirement ResourceQosClass = "ResourceRequirement"
+)
+
+// ResourceRequirement allow user override the default pod QoS classes
+type ResourceRequirement struct {
+	// +kubebuilder:validation:Enum=Default;BestEffort;ResourceRequirement
+	// +kubebuilder:default:=Default
+	Type ResourceQosClass `json:"type"`
+	// Resources defines resource requests and limits when Type is ResourceQosClassResourceRequirement
+	// +optional
+	Resources *corev1.ResourceRequirements `json:"resources,omitempty"`
 }
 
 // ServerURL represents the apiserver url and ca bundle that is accessible externally
