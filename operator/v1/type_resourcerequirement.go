@@ -2,7 +2,7 @@ package v1
 
 import corev1 "k8s.io/api/core/v1"
 
-type ResourceRequirementRequire interface {
+type ResourceRequirementAcquirer interface {
 	GetResourceRequirement() *ResourceRequirement
 }
 
@@ -26,11 +26,3 @@ const (
 	// Configurable resource requirements with requests and limits
 	ResourceQosClassResourceRequirement ResourceQosClass = "ResourceRequirement"
 )
-
-func (k *Klusterlet) GetResourceRequirement() *ResourceRequirement {
-	return k.Spec.ResourceRequirement
-}
-
-func (cm *ClusterManager) GetResourceRequirement() *ResourceRequirement {
-	return cm.Spec.ResourceRequirement
-}
